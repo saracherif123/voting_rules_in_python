@@ -256,7 +256,7 @@ if __name__ == "__main__":
     else:
         print("No Condorcet winner exists")
 
-     # Question 4: Plurality Voting with Runoff
+     # Question 4: Borda Voting
     print("\nQuestion 4: Borda Voting")
     borda_winner = BordaVoting(preferences)
     print(f"Borda Voting Winner: {borda_winner}")
