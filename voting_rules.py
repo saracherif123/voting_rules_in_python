@@ -102,10 +102,10 @@ def PluralityRunoff(preferences):
     # if tie at top, all tied top candidates move on; otherwise, the top two candidates move on
     if len(top_candidates) > 1:
         runoff_candidates = top_candidates
-        print(f"Tie in first round→ all move to runoff: {runoff_candidates}")
+        print(f"Tie in first round -> all move to runoff: {runoff_candidates}")
     else: 
         runoff_candidates = [candidate for candidate, votes in first_place_votes.most_common(2)]
-        print(f"candidate {top_candidates[0]} got less than 50% of votes → Top two candidates move to runoff: {runoff_candidates}")
+        print(f"candidate {top_candidates[0]} got less than 50% of votes -> Top two candidates move to runoff: {runoff_candidates}")
         
     # Count votes considering only the runoff candidates
     runoff_votes = []
@@ -124,7 +124,7 @@ def PluralityRunoff(preferences):
     # If tie, randomly choose a winner
     if len(runoff_winners) > 1:
         winner = random.choice(runoff_winners)
-        print(f"Tie in runoff→ randomly choosing winner from {runoff_winners}")
+        print(f"Tie in runoff -> randomly choosing winner from {runoff_winners}")
         return winner
     else:
         winner = runoff_winners[0]
@@ -212,8 +212,9 @@ def BordaVoting(preferences: List[List[str]]) -> List[str]:
             scores[candidate] += n_candidates - rank - 1
 
     # Show total scores
-    print("--- Total Scores ---")
-    for candidate, score in scores.items():
+    print("--- Total Scores ---") 
+    sorted_scores = dict(sorted(scores.items(), key=lambda item: item[1], reverse=True))
+    for candidate, score in sorted_scores.items():
         print(f"{candidate}: {score} points")
 
     max_score = max(scores.values())
@@ -226,6 +227,136 @@ def BordaVoting(preferences: List[List[str]]) -> List[str]:
     else:
         winner = winning_candidates[0]
         return winner
+
+def check_best_candidate_condition(preferences: List[List[str]], max_percentage: float = 0.5) -> bool:
+    """
+    Check if no more than the specified percentage of voters have the same best candidate.
+    
+    Args:
+        preferences: List of voter preferences, each as a list of candidates
+        max_percentage: Maximum allowed percentage (default: 0.5 for 50%)
+        
+    Returns:
+        bool: True if condition is satisfied, False otherwise
+    """
+    if not preferences:
+        return False
+        
+    # Count first place votes
+    first_place_votes = Counter(pref[0] for pref in preferences)
+    
+    # Calculate maximum percentage of voters with same best candidate
+    total_voters = len(preferences)
+    max_votes = max(first_place_votes.values())
+    max_percentage_actual = max_votes / total_voters
+    
+    return max_percentage_actual <= max_percentage
+
+def check_worst_candidate_condition(preferences: List[List[str]], max_percentage: float = 0.4) -> bool:
+    """
+    Check if no more than the specified percentage of voters have the same worst candidate.
+    
+    Args:
+        preferences: List of voter preferences, each as a list of candidates
+        max_percentage: Maximum allowed percentage (default: 0.4 for 40%)
+        
+    Returns:
+        bool: True if condition is satisfied, False otherwise
+    """
+    if not preferences:
+        return False
+        
+    # Count last place votes
+    last_place_votes = Counter(pref[-1] for pref in preferences)
+    
+    # Calculate maximum percentage of voters with same worst candidate
+    total_voters = len(preferences)
+    max_votes = max(last_place_votes.values())
+    max_percentage_actual = max_votes / total_voters
+    
+    return max_percentage_actual <= max_percentage
+
+def different_winners():
+    """
+    Create an election where all four methods produce different unique winners.
+    Requirements: n ≥ 60, m ≥ 8, ≤50% same best, ≤40% same worst
+    
+    Strategy:
+    - Group 1: A first (plurality winner) - rank C and D high for their wins
+    - Group 2: B first (runoff winner) - rank B > C > D, put A low for runoff
+    - Group 3: C first (Condorcet winner) - rank C > D > B, keep D high
+    - Group 4: D first (Borda winner) - but also appear 2nd/3rd in other groups
+    
+    Key: Each group must STRATEGICALLY rank ALL candidates to help specific winners
+    """
+    candidates = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
+    preferences = []
+    
+    # Group 1: 20 voters (33.3%) - A for PLURALITY
+    # Strategy: A first (most first-place votes)
+    #           C and D ranked high (help them for Condorcet/Borda)
+    #           B ranked low (hurt B's Borda score)
+    #           A ranked middle elsewhere (won't win Borda/Condorcet)
+    for i in range(20):
+        preferences.append(['A', 'C', 'D', 'E', 'F', 'B', 'G', 'H'])
+    
+    # Group 2: 18 voters (30%) - B for RUNOFF
+    # Strategy: B first (enough to reach runoff with A)
+    #           A ranked VERY LOW (so B beats A in runoff)
+    #           rank D higher than C to help D's Borda 
+    for i in range(18):
+        preferences.append(['B', 'D', 'E', 'C','F', 'A', 'H', 'G'])
+    
+    # Group 3: 12 voters (20%) - C for CONDORCET
+    # Strategy: C first (some first-place support)
+    #           D second (D gets high rankings for Borda)
+    #           Rank C > D > B > A (C beats all in pairwise)
+    for i in range(12):
+        preferences.append(['C', 'D', 'B', 'E', 'G', 'A', 'H', 'F'])
+    
+    # Group 4: 10 voters (16.7%) - D for BORDA
+    # Strategy: D first (some first-place support)
+    #           C fourth (help  Condorcet)
+    #           E third (diversify to meet constraints)
+    #           KEY: D must appear 2nd or 3rd in other groups!
+    for i in range(10):
+        preferences.append(['D', 'B', 'C', 'F', 'G', 'A', 'H', 'E'])
+    
+    return preferences
+
+def test_election():
+    # Create example election
+    preferences = different_winners()
+    
+    # Check conditions
+    print("Checking conditions:")
+    print(f"Best candidate condition satisfied: {check_best_candidate_condition(preferences)}")
+    print(f"Worst candidate condition satisfied: {check_worst_candidate_condition(preferences)}")
+    print()
+    
+    # Test all voting rules
+    print("Testing voting rules:")
+    
+    print("------Plurality Voting------")
+    plurality_winner = Plurality(preferences)
+    print(f"Plurality winner: {plurality_winner}")
+    print()
+
+    print("------Plurality with Runoff Voting------")
+    runoff_winner = PluralityRunoff(preferences)
+    print(f"Plurality with Runoff winner: {runoff_winner}")
+    print()
+
+    print("------Condorcet Voting------")
+    condorcet_winner = CondorcetVoting(preferences)
+    print(f"Condorcet winner: {condorcet_winner}")
+    print()
+    
+    print("------Borda Voting------")
+    borda_winner = BordaVoting(preferences)
+    print(f"Borda winner: {borda_winner}")
+
+
 
 if __name__ == "__main__":
     # Test with example dataset
@@ -261,3 +392,7 @@ if __name__ == "__main__":
     borda_winner = BordaVoting(preferences)
     print(f"Borda Voting Winner: {borda_winner}")
     print()
+
+    # Question 6: Election with different winners
+    print("Question 6: Election with Different Winners")
+    test_election()
