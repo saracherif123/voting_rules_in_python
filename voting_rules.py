@@ -6,10 +6,10 @@ This module implements various voting rules for the assignment.
 """
 
 import csv
+import random
 from typing import List, Optional
 from collections import Counter
 from pathlib import Path
-import random
 
 
 def load_election_data(csv_file: str) -> List[List[str]]:
@@ -38,12 +38,13 @@ def Plurality(preferences: List[List[str]]) -> List[str]:
     
     In plurality voting, each voter votes for their top choice.
     The candidate(s) with the most first-place votes win(s).
+    In case of ties, randomly select one winner.
     
     Args:
         preferences: List of voter preferences, each as a list of candidates
         
     Returns:
-        List of winner(s) (may contain multiple in case of tie)
+        List containing one winner (ties broken randomly)
     """
     # Count first-place votes for each candidate
     first_place_votes = Counter(pref[0] for pref in preferences)
@@ -54,11 +55,16 @@ def Plurality(preferences: List[List[str]]) -> List[str]:
     # Find the maximum number of votes
     max_votes = max(first_place_votes.values())
     
-    # Return all candidates with the maximum votes
-    winners = [candidate for candidate, votes in first_place_votes.items() 
-               if votes == max_votes]
+    # Get all candidates with the maximum votes (tied candidates)
+    tied_winners = [candidate for candidate, votes in first_place_votes.items() 
+                    if votes == max_votes]
     
-    return winners
+    # Randomly break ties by selecting one winner
+    if len(tied_winners) > 1:
+        winner = random.choice(tied_winners)
+        return [winner]
+    
+    return tied_winners
 
 def PluralityRunoff(preferences):
     """
