@@ -143,6 +143,7 @@ def CondorcetVoting(preferences: List[List[str]]) -> Optional[str]:
     
     A Condorcet winner is a candidate who beats every other candidate
     in pairwise comparisons (wins more head-to-head matchups).
+    In case of ties in pairwise comparisons, randomly breaks the tie.
     
     Args:
         preferences: List of voter preferences, each as a list of candidates
@@ -181,9 +182,15 @@ def CondorcetVoting(preferences: List[List[str]]) -> Optional[str]:
                     votes_for_opponent += 1
             
             # Candidate must beat opponent (more voters prefer candidate)
-            if votes_for_candidate <= votes_for_opponent:
+            # If tied, randomly break the tie
+            if votes_for_candidate < votes_for_opponent:
                 is_condorcet_winner = False
                 break
+            elif votes_for_candidate == votes_for_opponent:
+                # Tie: randomly decide winner of this pairwise comparison
+                if random.choice([True, False]):  # Randomly choose if candidate wins the tie
+                    is_condorcet_winner = False
+                    break
         
         if is_condorcet_winner:
             return candidate
