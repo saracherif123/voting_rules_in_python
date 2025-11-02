@@ -7,7 +7,7 @@ This module implements various voting rules for the assignment.
 
 import csv
 import random
-from typing import List, Optional
+from typing import List, Optional, Tuple, Dict
 from collections import Counter
 from pathlib import Path
 
@@ -289,6 +289,111 @@ def check_worst_candidate_condition(preferences: List[List[str]], max_percentage
     
     return max_percentage_actual <= max_percentage
 
+
+def check_all_methods_same_winner(preferences: List[List[str]]) -> Tuple[bool, Dict]:
+    """
+    Check if all four voting methods (Plurality, Plurality Runoff, 
+    Condorcet, Borda) give the same unique winner.
+    
+    This function tests the conditions for Question 5.
+    
+    Args:
+        preferences: List of voter preferences
+        
+    Returns:
+        Tuple (all_same: bool, results: dict with winners from each method)
+    """
+    plurality_result = Plurality(preferences)
+    runoff_result = PluralityRunoff(preferences)
+    condorcet_result = CondorcetVoting(preferences)
+    borda_result = BordaVoting(preferences)
+    
+    # Extract winners (handle different return types)
+    plurality_winner = plurality_result[0] if isinstance(plurality_result, list) and len(plurality_result) > 0 else None
+    runoff_winner = runoff_result if isinstance(runoff_result, str) else (runoff_result[0] if isinstance(runoff_result, list) and len(runoff_result) > 0 else None)
+    condorcet_winner = condorcet_result if isinstance(condorcet_result, str) else None
+    borda_winner = borda_result if isinstance(borda_result, str) else (borda_result[0] if isinstance(borda_result, list) and len(borda_result) > 0 else None)
+    
+    results = {
+        'plurality': plurality_winner,
+        'runoff': runoff_winner,
+        'condorcet': condorcet_winner,
+        'borda': borda_winner
+    }
+    
+    # Check if all methods have exactly one winner and they're the same
+    winners = [plurality_winner, runoff_winner, condorcet_winner, borda_winner]
+    unique_winners = [w for w in winners if w is not None]
+    
+    all_same = (len(unique_winners) == 4 and 
+                len(set(unique_winners)) == 1)
+    
+    return all_same, results
+
+
+def same_winner():
+    """
+    Create an election example where all four methods produce the same winner.
+    Requirements: n ≥ 60, m ≥ 8, ≤50% same best, ≤40% same worst
+    
+    Strategy: Make candidate A win in all methods
+    - Plurality: A has most first-place votes (but < 50%)
+    - Runoff: A reaches runoff and wins
+    - Condorcet: A beats all others pairwise
+    - Borda: A gets highest total points
+    """
+    candidates = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
+    preferences = []
+    
+    # Strategy: Make A strong in all methods
+    # Group 1: 28 voters (46.7%) - A first for PLURALITY
+    # A must be first but < 50% to satisfy constraint
+    # Diversify worst candidates to satisfy worst candidate constraint (≤40%)
+    # Max worst = 40% of 60 = 24 voters max for same worst candidate
+    # Distribute worst candidates: H, G, F, E to keep each ≤24
+    for i in range(7):
+        preferences.append(['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'])  # H worst
+    for i in range(7):
+        preferences.append(['A', 'B', 'C', 'D', 'E', 'F', 'H', 'G'])  # G worst
+    for i in range(7):
+        preferences.append(['A', 'B', 'C', 'D', 'E', 'G', 'H', 'F'])  # F worst
+    for i in range(7):
+        preferences.append(['A', 'B', 'C', 'D', 'E', 'H', 'G', 'F'])  # F worst
+    
+    # Group 2: 15 voters (25%) - A second, B first
+    # This helps A in Borda while keeping B competitive
+    # A still beats B pairwise for Condorcet
+    # Diversify worst candidates
+    for i in range(5):
+        preferences.append(['B', 'A', 'C', 'D', 'E', 'F', 'G', 'H'])  # H worst
+    for i in range(5):
+        preferences.append(['B', 'A', 'C', 'D', 'E', 'F', 'H', 'G'])  # G worst
+    for i in range(5):
+        preferences.append(['B', 'A', 'C', 'D', 'E', 'G', 'H', 'F'])  # F worst
+    
+    # Group 3: 10 voters (16.7%) - A second, C first
+    # A beats C pairwise, and gets Borda points
+    # Diversify worst candidates
+    for i in range(4):
+        preferences.append(['C', 'A', 'D', 'B', 'E', 'F', 'G', 'H'])  # H worst
+    for i in range(3):
+        preferences.append(['C', 'A', 'D', 'B', 'E', 'F', 'H', 'G'])  # G worst
+    for i in range(3):
+        preferences.append(['C', 'A', 'D', 'B', 'E', 'G', 'H', 'F'])  # F worst
+    
+    # Group 4: 7 voters (11.7%) - A second, D first
+    # A beats D pairwise and continues to accumulate Borda points
+    # Ensures A beats all in Condorcet
+    # Diversify worst candidates
+    for i in range(3):
+        preferences.append(['D', 'A', 'B', 'C', 'E', 'F', 'G', 'H'])  # H worst
+    for i in range(2):
+        preferences.append(['D', 'A', 'B', 'C', 'E', 'F', 'H', 'G'])  # G worst
+    for i in range(2):
+        preferences.append(['D', 'A', 'B', 'C', 'E', 'G', 'H', 'F'])  # F worst
+    
+    return preferences
+
 def different_winners():
     """
     Create an election where all four methods produce different unique winners.
@@ -406,6 +511,32 @@ if __name__ == "__main__":
     print(f"Borda Voting Winner: {borda_winner}")
     print()
 
+    # Question 5: Election with same winner for all methods
+    print("\n" + "="*60)
+    print("Question 5: Election with Same Winner for All Methods")
+    print("="*60)
+    preferences_q5 = same_winner()
+    print(f"Total voters: {len(preferences_q5)}")
+    print(f"Number of candidates: {len(preferences_q5[0])}")
+    print()
+    
+    # Check constraints
+    print("Checking constraints:")
+    best_ok = check_best_candidate_condition(preferences_q5, 0.5)
+    worst_ok = check_worst_candidate_condition(preferences_q5, 0.4)
+    print(f"  Best candidate condition (≤50%): {best_ok}")
+    print(f"  Worst candidate condition (≤40%): {worst_ok}")
+    print()
+    
+    # Check if all methods give same winner
+    print("Testing all voting methods:")
+    all_same, results = check_all_methods_same_winner(preferences_q5)
+    for method, winner in results.items():
+        print(f"  {method.capitalize()}: {winner}")
+    print()
+    print(f"All methods have same unique winner: {all_same}")
+    print("="*60)
+    
     # Question 6: Election with different winners
-    print("Question 6: Election with Different Winners")
+    print("\nQuestion 6: Election with Different Winners")
     test_election()
