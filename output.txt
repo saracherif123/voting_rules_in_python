@@ -1,0 +1,102 @@
+Loading election data...
+Loaded 27 voters
+
+
+============================================================
+Question 1: Plurality Voting
+============================================================
+Winner(s): ['d']
+
+
+============================================================
+Question 2: Plurality Voting with Runoff
+============================================================
+Total voters: 27
+Round 1 votes: Counter({'d': 10, 'a': 9, 'c': 8})
+candidate d got less than 50% of votes -> Top two candidates move to runoff: ['d', 'a']
+Round 2 votes: Counter({'a': 17, 'd': 10})
+Plurality Runoff Winner: a
+
+
+============================================================
+Question 3: Condorcet Voting
+============================================================
+Condorcet Winner: c
+
+============================================================
+Question 4: Borda Voting
+============================================================
+Number of candidates: 4
+--- Total Scores ---
+b: 48 points
+c: 47 points
+a: 37 points
+d: 30 points
+Borda Voting Winner: b
+
+
+============================================================
+Question 5: Election with Same Winner for All Methods
+============================================================
+Total voters: 60
+Number of candidates: 8
+
+Checking constraints:
+  Best candidate condition (≤50%): True
+  Worst candidate condition (≤40%): True
+
+Testing all voting methods:
+Total voters: 60
+Round 1 votes: Counter({'A': 28, 'B': 15, 'C': 10, 'D': 7})
+candidate A got less than 50% of votes -> Top two candidates move to runoff: ['A', 'B']
+Round 2 votes: Counter({'A': 45, 'B': 15})
+Number of candidates: 8
+--- Total Scores ---
+A: 388 points
+B: 348 points
+C: 313 points
+D: 271 points
+E: 180 points
+F: 72 points
+G: 60 points
+H: 48 points
+  Plurality: A
+  Runoff: A
+  Condorcet: A
+  Borda: A
+
+All methods have same unique winner: True
+
+============================================================
+Question 6: Election with Different Winners
+============================================================
+Checking conditions:
+Best candidate condition satisfied: True
+Worst candidate condition satisfied: True
+
+Testing voting rules:
+------Plurality Voting------
+Plurality winner: ['A']
+
+------Plurality with Runoff Voting------
+Total voters: 60
+Round 1 votes: Counter({'A': 20, 'B': 18, 'C': 12, 'D': 10})
+candidate A got less than 50% of votes -> Top two candidates move to runoff: ['A', 'B']
+Round 2 votes: Counter({'B': 40, 'A': 20})
+Plurality with Runoff winner: B
+
+------Condorcet Voting------
+Condorcet winner: C
+
+------Borda Voting------
+Number of candidates: 8
+--- Total Scores ---
+D: 350 points
+C: 326 points
+B: 286 points
+A: 220 points
+E: 218 points
+F: 154 points
+G: 86 points
+H: 40 points
+Borda winner: D

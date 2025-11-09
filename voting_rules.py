@@ -66,7 +66,7 @@ def Plurality(preferences: List[List[str]]) -> List[str]:
     
     return tied_winners
 
-def PluralityRunoff(preferences):
+def PluralityRunoff(preferences: List[List[str]]) -> str:
     """
     Compute the result of plurality runoff voting.
 
@@ -486,19 +486,25 @@ if __name__ == "__main__":
     print()
     
     # Question 1: Plurality
+    print("\n" + "="*60)
     print("Question 1: Plurality Voting")
+    print("="*60)
     plurality_winners = Plurality(preferences)
     print(f"Winner(s): {plurality_winners}")
     print()
 
     # Question 2: Plurality Voting with Runoff
+    print("\n" + "="*60)
     print("Question 2: Plurality Voting with Runoff")
+    print("="*60)
     plurality_runoff_winner = PluralityRunoff(preferences)
     print(f"Plurality Runoff Winner: {plurality_runoff_winner}")
     print()
     
     # Question 3: Condorcet
+    print("\n" + "="*60)
     print("Question 3: Condorcet Voting")
+    print("="*60)
     condorcet_winner = CondorcetVoting(preferences)
     if condorcet_winner:
         print(f"Condorcet Winner: {condorcet_winner}")
@@ -506,7 +512,9 @@ if __name__ == "__main__":
         print("No Condorcet winner exists")
 
      # Question 4: Borda Voting
-    print("\nQuestion 4: Borda Voting")
+    print("\n" + "="*60)
+    print("Question 4: Borda Voting")
+    print("="*60)
     borda_winner = BordaVoting(preferences)
     print(f"Borda Voting Winner: {borda_winner}")
     print()
@@ -535,8 +543,9 @@ if __name__ == "__main__":
         print(f"  {method.capitalize()}: {winner}")
     print()
     print(f"All methods have same unique winner: {all_same}")
-    print("="*60)
+    print("\n" + "="*60)
     
     # Question 6: Election with different winners
-    print("\nQuestion 6: Election with Different Winners")
+    print("Question 6: Election with Different Winners")
+    print("="*60)
     test_election()
