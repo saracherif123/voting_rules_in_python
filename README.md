@@ -1,5 +1,9 @@
 # Voting Rules in Python
 
+**By:** Oluwanifemi Olajuyigbe and Sara Saad
+
+## Overview
+
 Implementation of voting rules for the Decision Modeling assignment.
 
 ## Dataset Generation
