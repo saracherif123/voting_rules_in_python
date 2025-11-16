@@ -197,7 +197,7 @@ def CondorcetVoting(preferences: List[List[str]]) -> Optional[str]:
     
     return None
 
-def BordaVoting(preferences: List[List[str]]) -> List[str]:
+def BordaVoting(preferences: List[List[str]]) -> str:
     """
     Compute the result of Borda count voting.
 
@@ -536,12 +536,33 @@ if __name__ == "__main__":
     print(f"  Worst candidate condition (≤40%): {worst_ok}")
     print()
     
-    # Check if all methods give same winner
-    print("Testing all voting methods:")
-    all_same, results = check_all_methods_same_winner(preferences_q5)
-    for method, winner in results.items():
-        print(f"  {method.capitalize()}: {winner}")
+    # Test all voting rules
+    print("Testing voting rules:")
+    
+    print("------Plurality Voting------")
+    plurality_winner = Plurality(preferences_q5)
+    print(f"Plurality winner: {plurality_winner}")
     print()
+
+    print("------Plurality with Runoff Voting------")
+    runoff_winner = PluralityRunoff(preferences_q5)
+    print(f"Plurality with Runoff winner: {runoff_winner}")
+    print()
+
+    print("------Condorcet Voting------")
+    condorcet_winner = CondorcetVoting(preferences_q5)
+    print(f"Condorcet winner: {condorcet_winner}")
+    print()
+    
+    print("------Borda Voting------")
+    borda_winner = BordaVoting(preferences_q5)
+    print(f"Borda winner: {borda_winner}")
+    print()
+    
+    # Check if all methods give same winner
+    plurality_winner_str = plurality_winner[0] if isinstance(plurality_winner, list) and len(plurality_winner) > 0 else None
+    all_same = (plurality_winner_str == runoff_winner == condorcet_winner == borda_winner and 
+                plurality_winner_str is not None)
     print(f"All methods have same unique winner: {all_same}")
     print("\n" + "="*60)
     

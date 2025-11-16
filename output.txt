@@ -34,7 +34,6 @@ a: 37 points
 d: 30 points
 Borda Voting Winner: b
 
-
 ============================================================
 Question 5: Election with Same Winner for All Methods
 ============================================================
@@ -45,11 +44,21 @@ Checking constraints:
   Best candidate condition (≤50%): True
   Worst candidate condition (≤40%): True
 
-Testing all voting methods:
+Testing voting rules:
+------Plurality Voting------
+Plurality winner: ['A']
+
+------Plurality with Runoff Voting------
 Total voters: 60
 Round 1 votes: Counter({'A': 28, 'B': 15, 'C': 10, 'D': 7})
 candidate A got less than 50% of votes -> Top two candidates move to runoff: ['A', 'B']
 Round 2 votes: Counter({'A': 45, 'B': 15})
+Plurality with Runoff winner: A
+
+------Condorcet Voting------
+Condorcet winner: A
+
+------Borda Voting------
 Number of candidates: 8
 --- Total Scores ---
 A: 388 points
@@ -60,12 +69,10 @@ E: 180 points
 F: 72 points
 G: 60 points
 H: 48 points
-  Plurality: A
-  Runoff: A
-  Condorcet: A
-  Borda: A
+Borda winner: A
 
 All methods have same unique winner: True
+
 
 ============================================================
 Question 6: Election with Different Winners
