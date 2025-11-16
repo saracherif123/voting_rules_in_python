@@ -34,6 +34,7 @@ a: 37 points
 d: 30 points
 Borda Voting Winner: b
 
+
 ============================================================
 Question 5: Election with Same Winner for All Methods
 ============================================================
@@ -65,14 +66,13 @@ A: 388 points
 B: 348 points
 C: 313 points
 D: 271 points
-E: 180 points
-F: 72 points
-G: 60 points
-H: 48 points
+E: 150 points
+F: 100 points
+G: 72 points
+H: 38 points
 Borda winner: A
 
 All methods have same unique winner: True
-
 
 ============================================================
 Question 6: Election with Different Winners

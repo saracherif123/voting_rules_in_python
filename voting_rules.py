@@ -346,51 +346,33 @@ def same_winner():
     preferences = []
     
     # Strategy: Make A strong in all methods
-    # Group 1: 28 voters (46.7%) - A first for PLURALITY
-    # A must be first but < 50% to satisfy constraint
-    # Diversify worst candidates to satisfy worst candidate constraint (≤40%)
-    # Max worst = 40% of 60 = 24 voters max for same worst candidate
-    # Distribute worst candidates: H, G, F, E to keep each ≤24
-    for i in range(7):
-        preferences.append(['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'])  # H worst
-    for i in range(7):
-        preferences.append(['A', 'B', 'C', 'D', 'E', 'F', 'H', 'G'])  # G worst
-    for i in range(7):
-        preferences.append(['A', 'B', 'C', 'D', 'E', 'G', 'H', 'F'])  # F worst
-    for i in range(7):
-        preferences.append(['A', 'B', 'C', 'D', 'E', 'H', 'G', 'F'])  # F worst
+    # Simpler version: Each group has ONE consistent preference order
+    # Distribute worst candidates across groups to satisfy ≤40% constraint
     
-    # Group 2: 15 voters (25%) - A second, B first
-    # This helps A in Borda while keeping B competitive
-    # A still beats B pairwise for Condorcet
-    # Diversify worst candidates
-    for i in range(5):
-        preferences.append(['B', 'A', 'C', 'D', 'E', 'F', 'G', 'H'])  # H worst
-    for i in range(5):
-        preferences.append(['B', 'A', 'C', 'D', 'E', 'F', 'H', 'G'])  # G worst
-    for i in range(5):
+    # Group 1: 15 voters (25%) - A first, H worst
+    # Gives A first-place votes for Plurality
+    for i in range(15):
+        preferences.append(['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'])  # H worst
+    
+    # Group 2: 13 voters (21.7%) - A first, G worst
+    # More first-place votes for A (total A first = 28 = 46.7%)
+    for i in range(13):
+        preferences.append(['A', 'B', 'C', 'D', 'E', 'F', 'H', 'G'])  # G worst
+    
+    # Group 3: 15 voters (25%) - B first, A second, F worst
+    # Helps A in Borda and Condorcet (A beats B pairwise)
+    for i in range(15):
         preferences.append(['B', 'A', 'C', 'D', 'E', 'G', 'H', 'F'])  # F worst
     
-    # Group 3: 10 voters (16.7%) - A second, C first
-    # A beats C pairwise, and gets Borda points
-    # Diversify worst candidates
-    for i in range(4):
-        preferences.append(['C', 'A', 'D', 'B', 'E', 'F', 'G', 'H'])  # H worst
-    for i in range(3):
-        preferences.append(['C', 'A', 'D', 'B', 'E', 'F', 'H', 'G'])  # G worst
-    for i in range(3):
-        preferences.append(['C', 'A', 'D', 'B', 'E', 'G', 'H', 'F'])  # F worst
+    # Group 4: 10 voters (16.7%) - C first, A second, E worst
+    # More Borda points for A, A beats C pairwise
+    for i in range(10):
+        preferences.append(['C', 'A', 'D', 'B', 'F', 'G', 'H', 'E'])  # E worst
     
-    # Group 4: 7 voters (11.7%) - A second, D first
-    # A beats D pairwise and continues to accumulate Borda points
-    # Ensures A beats all in Condorcet
-    # Diversify worst candidates
-    for i in range(3):
+    # Group 5: 7 voters (11.7%) - D first, A second, H worst
+    # More Borda points for A, A beats D pairwise
+    for i in range(7):
         preferences.append(['D', 'A', 'B', 'C', 'E', 'F', 'G', 'H'])  # H worst
-    for i in range(2):
-        preferences.append(['D', 'A', 'B', 'C', 'E', 'F', 'H', 'G'])  # G worst
-    for i in range(2):
-        preferences.append(['D', 'A', 'B', 'C', 'E', 'G', 'H', 'F'])  # F worst
     
     return preferences
 
